@@ -7,16 +7,18 @@ const router = express.Router();
 
 router.post('/signup', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, fullName } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({ username, password: hashedPassword, fullName });
     await user.save();
+    const token = jwt.sign({ userId: user._id, fullName: user.fullName, username: user.username }, 'secretkey');
+    res.status(201).json({ message: 'User created successfully', token });
 
-    res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Error creating user', error });
+    console.error(error.message);
+    res.status(500).json({ message: 'Error creating user', error: error.message });
   }
 });
 
@@ -34,7 +36,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ userId: user._id }, 'secretkey');
+    const token = jwt.sign({ userId: user._id, fullName: user.fullName, username: user.username }, 'secretkey');
 
     res.json({ token });
   } catch (error) {
@@ -42,7 +44,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get('/user', async (req, res) => {
+router.get('/user', (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
@@ -50,13 +52,8 @@ router.get('/user', async (req, res) => {
     }
 
     const decoded = jwt.verify(token, 'secretkey');
-    const user = await User.findById(decoded.userId);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    res.json({ fullName: user.fullName });
+    res.json({ fullName: decoded.fullName, username: decoded.username });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching user details', error });
   }

@@ -14,35 +14,14 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const backendUrl = Constants.expoConfig?.extra?.BACKEND_URL || 'https://41bd-2409-40f0-2e-8d93-e917-86f5-fa6-d9c7.ngrok-free.app';
-      const response = await fetch(`${backendUrl}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: email, password }),
-      });
+      const dummyToken = 'dummyToken';
+      const dummyFullName = 'Dummy User';
+      const dummyUsername = email;
 
-      const data = await response.json();
-
-      if (response.ok) {
-        await AsyncStorage.setItem('token', data.token);
-        // Fetch user details
-        const userResponse = await fetch('http://localhost:5000/auth/user', {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-        });
-        const userData = await userResponse.json();
-        if (userResponse.ok) {
-          await AsyncStorage.setItem('fullName', userData.fullName);
-          router.replace('/(tabs)');
-        } else {
-          setError(userData.message || 'Failed to fetch user details');
-        }
-      } else {
-        setError(data.message || 'Invalid credentials');
-      }
+      await AsyncStorage.setItem('token', dummyToken);
+      await AsyncStorage.setItem('fullName', dummyFullName);
+      await AsyncStorage.setItem('username', dummyUsername);
+      router.replace('/(tabs)');
     } catch (error) {
       setError('Failed to login');
       console.error('Login error:', error);

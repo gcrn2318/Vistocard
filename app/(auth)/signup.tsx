@@ -14,8 +14,8 @@ export default function Signup() {
 
   const handleSignup = async () => {
     try {
-      const backendUrl = Constants.expoConfig?.extra?.BACKEND_URL || 'https://41bd-2409-40f0-2e-8d93-e917-86f5-fa6-d9c7.ngrok-free.app';
-      const response = await fetch(`${backendUrl}/auth/signup`, {
+      const backendUrl = 'http://127.0.0.1:5000';
+      const response = await fetch(backendUrl + '/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,12 +23,25 @@ export default function Signup() {
         body: JSON.stringify({ fullName: name, username: email, password }),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (error) {
+        console.error('Failed to parse JSON:', text);
+        Alert.alert('Signup Error', 'Failed to parse server response.');
+        return;
+      }
 
       if (response.ok) {
         // Signup successful, store the token and redirect
         await AsyncStorage.setItem('token', data.token);
-        await AsyncStorage.setItem('fullName', name);
+        const tokenParts = data.token.split('.');
+        const encodedPayload = tokenParts[1];
+        const rawPayload = atob(encodedPayload);
+        const payload = JSON.parse(rawPayload);
+        await AsyncStorage.setItem('fullName', payload.fullName);
+        await AsyncStorage.setItem('username', payload.username);
         router.replace('/(tabs)');
       } else {
         // Signup failed, display the error message
