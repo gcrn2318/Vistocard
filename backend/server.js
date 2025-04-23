@@ -11,7 +11,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect("mongodb+srv://admins:visitingcards@vistocard.t30ugqa.mongodb.net/?retryWrites=true&w=majority&appName=VistoCard", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => console.log('Connected to MongoDB'))

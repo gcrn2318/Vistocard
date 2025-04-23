@@ -14,7 +14,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const backendUrl = Constants.expoConfig?.extra?.BACKEND_URL || 'http://localhost:5000';
+      const backendUrl = Constants.expoConfig?.extra?.BACKEND_URL || 'https://41bd-2409-40f0-2e-8d93-e917-86f5-fa6-d9c7.ngrok-free.app';
       const response = await fetch(`${backendUrl}/auth/login`, {
         method: 'POST',
         headers: {

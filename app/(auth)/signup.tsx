@@ -1,18 +1,43 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import Constants from 'expo-constants';
 export default function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSignup = () => {
-    // TODO: Implement actual signup logic
-    router.replace('/(tabs)');
+  const handleSignup = async () => {
+    try {
+      const backendUrl = Constants.expoConfig?.extra?.BACKEND_URL || 'https://41bd-2409-40f0-2e-8d93-e917-86f5-fa6-d9c7.ngrok-free.app';
+      const response = await fetch(`${backendUrl}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fullName: name, username: email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Signup successful, store the token and redirect
+        await AsyncStorage.setItem('token', data.token);
+        await AsyncStorage.setItem('fullName', name);
+        router.replace('/(tabs)');
+      } else {
+        // Signup failed, display the error message
+        Alert.alert('Signup Failed', data.message || 'An error occurred during signup.');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      Alert.alert('Signup Error', 'Failed to connect to the server.');
+    }
   };
 
   return (
