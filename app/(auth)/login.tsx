@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Constants from 'expo-constants';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,7 +14,8 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:5000/auth/login', {
+      const backendUrl = Constants.expoConfig?.extra?.BACKEND_URL || 'http://localhost:5000';
+      const response = await fetch(`${backendUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

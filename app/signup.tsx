@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import Constants from 'expo-constants';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function Signup() {
@@ -9,7 +10,8 @@ export default function Signup() {
 
   const handleSignup = async () => {
     try {
-      const response = await fetch('http://localhost:5000/auth/signup', {
+      const backendUrl = Constants.expoConfig?.extra?.BACKEND_URL || 'http://localhost:5000';
+      const response = await fetch(`${backendUrl}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
